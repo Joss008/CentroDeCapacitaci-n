@@ -1,0 +1,461 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Académico | Supabase</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 15px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px #00000010;
+        }
+
+        h2 {
+            font-size: 19px;
+            margin-top: 0;
+        }
+
+        input, select, button {
+            padding: 11px;
+            border-radius: 7px;
+            border: 1px solid #cbd5e1;
+            width: 100%;
+            margin: 6px 0 12px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+        }
+
+        #estado {
+            padding: 12px;
+            border-radius: 7px;
+            background: #e2e8f0;
+            margin-top: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .success {
+            background: #dcfce7 !important;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2 !important;
+            color: #991b1b;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        th {
+            background: #eff6ff;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Sistema de Gestión Académica</h1>
+    <p>Prueba de conexión con Supabase</p>
+</header>
+
+<main>
+
+    <section class="card">
+        <h2>Estado de conexión</h2>
+        <button onclick="conectar()">Comprobar conexión</button>
+        <div id="estado">Esperando conexión...</div>
+    </section>
+
+    <div class="grid">
+
+        <section class="card">
+            <h2>Registrar carrera</h2>
+            <form id="formCarrera">
+                <label>ID Carrera</label>
+                <input name="id_carrera" placeholder="CAR001" required maxlength="10">
+
+                <label>Nombre de carrera</label>
+                <input name="nombre_carrera" placeholder="Ingeniería de Sistemas" required maxlength="100">
+
+                <button>Guardar carrera</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Registrar docente</h2>
+            <form id="formDocente">
+                <label>ID Docente</label>
+                <input name="id_docente" placeholder="DOC001" required maxlength="10">
+
+                <label>Nombre del docente</label>
+                <input name="nombre_docente" placeholder="Juan Pérez" required maxlength="100">
+
+                <button>Guardar docente</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Registrar alumno</h2>
+            <form id="formAlumno">
+                <label>ID Alumno</label>
+                <input name="id_alumno" placeholder="ALU001" required maxlength="10">
+
+                <label>Nombre del alumno</label>
+                <input name="nombre_alumno" placeholder="Pedro López" required maxlength="100">
+
+                <label>DNI</label>
+                <input name="dni" placeholder="12345678" required minlength="8" maxlength="8" pattern="[0-9]{8}">
+
+                <label>Carrera</label>
+                <select name="id_carrera" id="carreraSelect" required>
+                    <option value="">Seleccionar carrera</option>
+                </select>
+
+                <button>Guardar alumno</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Registrar curso</h2>
+            <form id="formCurso">
+                <label>ID Curso</label>
+                <input name="id_curso" placeholder="CUR001" required maxlength="10">
+
+                <label>Nombre del curso</label>
+                <input name="nombre_curso" placeholder="Programación" required maxlength="100">
+
+                <label>Docente</label>
+                <select name="id_docente" id="docenteSelect" required>
+                    <option value="">Seleccionar docente</option>
+                </select>
+
+                <button>Guardar curso</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <h2>Registrar matrícula</h2>
+            <form id="formMatricula">
+                <label>Alumno</label>
+                <select name="id_alumno" id="alumnoSelect" required>
+                    <option value="">Seleccionar alumno</option>
+                </select>
+
+                <label>Curso</label>
+                <select name="id_curso" id="cursoSelect" required>
+                    <option value="">Seleccionar curso</option>
+                </select>
+
+                <label>Nota</label>
+                <input name="nota" type="number" step="0.01" min="0" max="20" placeholder="18.50" required>
+
+                <button>Guardar matrícula</button>
+            </form>
+        </section>
+
+    </div>
+
+    <section class="card">
+        <h2>Consultar registros</h2>
+
+        <select id="tablaSelect">
+            <option value="carrera">Carreras</option>
+            <option value="docente">Docentes</option>
+            <option value="alumno">Alumnos</option>
+            <option value="curso">Cursos</option>
+            <option value="matricula">Matrículas</option>
+        </select>
+
+        <button onclick="consultar()">Mostrar registros</button>
+
+        <div class="table-container">
+            <table>
+                <thead id="encabezado"></thead>
+                <tbody id="contenido"></tbody>
+            </table>
+        </div>
+    </section>
+
+</main>
+
+<script>
+    // ====================================
+    // CONFIGURACIÓN DE SUPABASE
+    // ====================================
+
+    const SUPABASE_URL = "https://oyhgifvlgevomilolctp.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_2emI4gh_sR6SduQn9OasgA_9K6_zPUA";
+
+    const supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+    // ====================================
+    // MENSAJES
+    // ====================================
+
+    function mensaje(texto, tipo = "") {
+        const estado = document.getElementById("estado");
+        estado.textContent = texto;
+        estado.className = tipo;
+    }
+
+    // ====================================
+    // COMPROBAR CONEXIÓN
+    // ====================================
+
+    async function conectar() {
+        try {
+            mensaje("Conectando...");
+
+            const { data, error } = await supabaseClient
+                .from("carrera")
+                .select("*")
+                .limit(1);
+
+            if (error) throw error;
+
+            mensaje("¡Conexión exitosa con Supabase!", "success");
+
+            await cargarSelects();
+
+        } catch (error) {
+            mensaje("Error: " + error.message, "error");
+        }
+    }
+
+    // ====================================
+    // CARGAR LISTAS DESPLEGABLES
+    // ====================================
+
+    async function cargarSelects() {
+
+        const consultas = [
+            ["carrera", "carreraSelect", "id_carrera", "nombre_carrera"],
+            ["docente", "docenteSelect", "id_docente", "nombre_docente"],
+            ["alumno", "alumnoSelect", "id_alumno", "nombre_alumno"],
+            ["curso", "cursoSelect", "id_curso", "nombre_curso"]
+        ];
+
+        for (const [tabla, selectId, id, nombre] of consultas) {
+
+            const { data, error } = await supabaseClient
+                .from(tabla)
+                .select(`${id}, ${nombre}`);
+
+            if (error) {
+                console.error(error);
+                continue;
+            }
+
+            const select = document.getElementById(selectId);
+
+            select.innerHTML = '<option value="">Seleccionar</option>';
+
+            data.forEach(registro => {
+                const option = document.createElement("option");
+
+                option.value = registro[id];
+                option.textContent = registro[nombre] +
+                    " (" + registro[id] + ")";
+
+                select.appendChild(option);
+            });
+        }
+    }
+
+    // ====================================
+    // REGISTRAR DATOS
+    // ====================================
+
+    async function registrar(formId, tabla) {
+
+        const form = document.getElementById(formId);
+        const datos = Object.fromEntries(new FormData(form));
+
+        if (datos.nota !== undefined) {
+            datos.nota = Number(datos.nota);
+        }
+
+        const { error } = await supabaseClient
+            .from(tabla)
+            .insert([datos]);
+
+        if (error) {
+            mensaje("Error al registrar: " + error.message, "error");
+            return;
+        }
+
+        mensaje("Registro guardado correctamente en " + tabla, "success");
+
+        form.reset();
+
+        await cargarSelects();
+        await consultar();
+    }
+
+    // Eventos de formularios
+
+    document.getElementById("formCarrera").addEventListener("submit", e => {
+        e.preventDefault();
+        registrar("formCarrera", "carrera");
+    });
+
+    document.getElementById("formDocente").addEventListener("submit", e => {
+        e.preventDefault();
+        registrar("formDocente", "docente");
+    });
+
+    document.getElementById("formAlumno").addEventListener("submit", e => {
+        e.preventDefault();
+        registrar("formAlumno", "alumno");
+    });
+
+    document.getElementById("formCurso").addEventListener("submit", e => {
+        e.preventDefault();
+        registrar("formCurso", "curso");
+    });
+
+    document.getElementById("formMatricula").addEventListener("submit", e => {
+        e.preventDefault();
+        registrar("formMatricula", "matricula");
+    });
+
+    // ====================================
+    // CONSULTAR TABLAS
+    // ====================================
+
+    async function consultar() {
+
+        const tabla = document.getElementById("tablaSelect").value;
+
+        const { data, error } = await supabaseClient
+            .from(tabla)
+            .select("*");
+
+        if (error) {
+            mensaje("Error al consultar: " + error.message, "error");
+            return;
+        }
+
+        const encabezado = document.getElementById("encabezado");
+        const contenido = document.getElementById("contenido");
+
+        encabezado.innerHTML = "";
+        contenido.innerHTML = "";
+
+        if (data.length === 0) {
+            encabezado.innerHTML = "<tr><th>Resultado</th></tr>";
+            contenido.innerHTML = "<tr><td>No hay registros todavía.</td></tr>";
+            return;
+        }
+
+        // Crear encabezados automáticamente
+
+        const columnas = Object.keys(data[0]);
+
+        const filaHeader = document.createElement("tr");
+
+        columnas.forEach(columna => {
+            const th = document.createElement("th");
+            th.textContent = columna;
+            filaHeader.appendChild(th);
+        });
+
+        encabezado.appendChild(filaHeader);
+
+        // Mostrar registros
+
+        data.forEach(registro => {
+
+            const fila = document.createElement("tr");
+
+            columnas.forEach(columna => {
+                const td = document.createElement("td");
+                td.textContent = registro[columna] ?? "-";
+                fila.appendChild(td);
+            });
+
+            contenido.appendChild(fila);
+        });
+
+        mensaje("Consulta exitosa: " + data.length + " registros.", "success");
+    }
+
+    // ====================================
+    // INICIAR
+    // ====================================
+
+    window.addEventListener("DOMContentLoaded", conectar);
+
+</script>
+
+</body>
+</html>
